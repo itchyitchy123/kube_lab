@@ -1,0 +1,129 @@
+global:
+  storageClass: ""
+
+secrets:
+  # For demos only. Override with secrets.local.yaml (gitignored) or --set-string.
+  wordpressDatabasePassword: change-me-in-production
+  mariadbRootPassword: change-root-password
+  redisPassword: change-redis-password
+
+nginx:
+  replicaCount: 2
+  image: nginx:1.27-alpine
+  service:
+    port: 80
+  ingress:
+    enabled: true
+    className: nginx
+    host: nginx.homelab.local
+  resources:
+    requests: { cpu: 50m, memory: 64Mi }
+    limits: { cpu: 200m, memory: 128Mi }
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+wordpress:
+  replicaCount: 1
+  image: wordpress:6.6-apache
+  ingress:
+    enabled: true
+    className: nginx
+    host: wordpress.homelab.local
+  persistence:
+    size: 5Gi
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+  autoscaling:
+    # Keep disabled with the default ReadWriteOnce volume. Enable after switching to RWX.
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+
+mariadb:
+  image: mariadb:11.4
+  database: wordpress
+  user: wordpress
+  persistence:
+    size: 5Gi
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+redis:
+  image: redis:7.4-alpine
+  persistence:
+    size: 1Gi
+  resources:
+    requests: { cpu: 50m, memory: 64Mi }
+    limits: { cpu: 250m, memory: 256Mi }
+
+monitoring:
+  enabled: true
+  grafana:
+    adminPassword: change-grafana-password
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts: [grafana.homelab.local]
+    persistence:
+      enabled: true
+      size: 2Gi
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://homelab-loki-gateway
+  prometheus:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts: [prometheus.homelab.local]
+    prometheusSpec:
+      retention: 7d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 5Gi
+
+loki:
+  enabled: true
+  deploymentMode: SingleBinary
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    schemaConfig:
+      configs:
+        - from: "2024-04-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    storage:
+      type: filesystem
+  singleBinary:
+    replicas: 1
+    persistence:
+      enabled: true
+      size: 5Gi
+  read: { replicas: 0 }
+  write: { replicas: 0 }
+  backend: { replicas: 0 }
+  gateway:
+    enabled: true
+
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://homelab-loki-gateway/loki/api/v1/push

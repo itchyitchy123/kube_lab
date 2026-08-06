@@ -1,0 +1,11 @@
+# Copy to secrets.local.yaml (gitignored), replace every value, and install with
+# `helm upgrade --install ... -f values.yaml -f secrets.local.yaml`.
+secrets:
+  wordpressDatabasePassword: replace-with-a-long-random-password
+  mariadbRootPassword: replace-with-a-different-long-random-password
+  redisPassword: replace-with-a-long-random-password
+
+monitoring:
+  grafana:
+    adminPassword: replace-with-a-long-random-password
+
