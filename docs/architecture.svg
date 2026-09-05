@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650" role="img" aria-labelledby="title desc">
+  <title id="title">Kubernetes home lab architecture</title>
+  <desc id="desc">Ingress routes traffic to NGINX and WordPress. WordPress uses MariaDB and Redis. Prometheus and Promtail feed Grafana and Loki.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+    <style>.box{fill:#fff;stroke:#334155;stroke-width:2;rx:12}.data{fill:#eff6ff;stroke:#2563eb}.observe{fill:#f0fdf4;stroke:#16a34a}.title{font:700 18px system-ui,sans-serif;fill:#0f172a}.label{font:14px system-ui,sans-serif;fill:#334155}.small{font:12px system-ui,sans-serif;fill:#475569}.arrow{stroke:#64748b;stroke-width:2;fill:none;marker-end:url(#arrow)}.dash{stroke-dasharray:7 6}</style>
+  </defs>
+  <rect width="1100" height="650" fill="#f8fafc"/>
+  <text x="550" y="38" text-anchor="middle" class="title" font-size="24">Kubernetes Home Lab</text>
+  <text x="550" y="62" text-anchor="middle" class="small">Helm-managed workloads, persistent data, autoscaling, metrics and logs</text>
+  <rect x="55" y="105" width="180" height="75" class="box"/><text x="145" y="135" text-anchor="middle" class="title">Client</text><text x="145" y="159" text-anchor="middle" class="label">localhost / DNS hosts</text>
+  <rect x="300" y="105" width="190" height="75" class="box"/><text x="395" y="135" text-anchor="middle" class="title">ingress-nginx</text><text x="395" y="159" text-anchor="middle" class="label">host-based routing</text>
+  <rect x="570" y="90" width="190" height="75" class="box"/><text x="665" y="120" text-anchor="middle" class="title">NGINX</text><text x="665" y="144" text-anchor="middle" class="label">Deployment + HPA</text>
+  <rect x="570" y="200" width="190" height="75" class="box"/><text x="665" y="230" text-anchor="middle" class="title">WordPress</text><text x="665" y="254" text-anchor="middle" class="label">Deployment + PVC</text>
+  <rect x="850" y="170" width="190" height="75" class="box data"/><text x="945" y="200" text-anchor="middle" class="title">MariaDB</text><text x="945" y="224" text-anchor="middle" class="label">StatefulSet + PVC</text>
+  <rect x="850" y="285" width="190" height="75" class="box data"/><text x="945" y="315" text-anchor="middle" class="title">Redis</text><text x="945" y="339" text-anchor="middle" class="label">StatefulSet + PVC</text>
+  <rect x="55" y="430" width="190" height="75" class="box observe"/><text x="150" y="460" text-anchor="middle" class="title">Prometheus</text><text x="150" y="484" text-anchor="middle" class="label">metrics + PVC</text>
+  <rect x="325" y="430" width="190" height="75" class="box observe"/><text x="420" y="460" text-anchor="middle" class="title">Grafana</text><text x="420" y="484" text-anchor="middle" class="label">dashboards + PVC</text>
+  <rect x="595" y="430" width="190" height="75" class="box observe"/><text x="690" y="460" text-anchor="middle" class="title">Promtail</text><text x="690" y="484" text-anchor="middle" class="label">node log agents</text>
+  <rect x="865" y="430" width="175" height="75" class="box observe"/><text x="952" y="460" text-anchor="middle" class="title">Loki</text><text x="952" y="484" text-anchor="middle" class="label">logs + PVC</text>
+  <path d="M235 142 H300" class="arrow"/><path d="M490 130 H570" class="arrow"/><path d="M490 155 C530 155 530 237 570 237" class="arrow"/><path d="M760 237 H850" class="arrow"/><path d="M760 260 C810 260 810 322 850 322" class="arrow"/>
+  <path d="M665 275 V395 H150 V430" class="arrow dash"/><path d="M665 165 V395 H150" class="arrow dash"/><path d="M690 430 V395 H945 V360" class="arrow dash"/><path d="M245 467 H325" class="arrow"/><path d="M515 467 H865" class="arrow"/>
+  <text x="550" y="585" text-anchor="middle" class="small">Solid arrows: application traffic/data dependencies · Dashed arrows: observability signals</text>
+</svg>

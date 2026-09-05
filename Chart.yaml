@@ -1,6 +1,6 @@
 apiVersion: v2
 name: kubernetes-homelab
-description: Portfolio-ready Kubernetes homelab with web, data, and observability services
+description: Reproducible Kubernetes platform with Helm, StatefulSets, HPA, ingress, Prometheus, Grafana and Loki
 type: application
 version: 0.1.0
 appVersion: "1.0.0"

@@ -17,17 +17,9 @@ A reproducible, portfolio-ready Kubernetes platform that runs a web tier, a stat
 | Logs | Promtail node agents ship container logs into single-binary Loki |
 | Automation | Idempotent Bash scripts and GitHub Actions chart validation |
 
-```text
-Internet / localhost
-        |
- ingress-nginx
-    |       |
-  NGINX  WordPress ---- MariaDB (PVC)
-            |
-          Redis (PVC)
+![Kubernetes home lab architecture](docs/architecture.svg)
 
-Promtail --> Loki (PVC) --> Grafana <-- Prometheus (PVC)
-```
+The diagram is also available as [a standalone SVG](docs/architecture.svg) for project write-ups.
 
 ## Prerequisites
 
@@ -82,6 +74,38 @@ helm upgrade homelab . -n homelab -f values.yaml -f secrets.local.yaml
 helm uninstall homelab -n homelab
 ```
 
+## Failure and recovery demonstrations
+
+The most useful part of this lab is seeing Kubernetes reconcile faults rather than only reading manifests. Run the complete walkthrough after deployment:
+
+```bash
+./scripts/demo-failure-recovery.sh
+```
+
+It demonstrates four observable behaviors:
+
+1. Delete an NGINX pod; its Deployment creates a replacement.
+2. Replace the NGINX readiness path with a failing path; the Service removes the unready pod from its endpoints, then the script restores the probe.
+3. Generate sustained HTTP traffic; the CPU-based HPA increases NGINX replicas.
+4. Remove the load and observe the HPA return to its configured minimum.
+5. Write a marker to MariaDB, delete its pod, and query the marker after the StatefulSet recreates the same pod against its PVC.
+
+The expected HPA evidence is easy to explain in a screen recording:
+
+```text
+Normal:        2 replicas
+Load generated: CPU above 70%
+HPA:           2 -> 4/6 replicas
+Load removed:  HPA returns to 2 replicas
+MariaDB:       pod replaced; PVC-backed marker still present
+```
+
+The exact commands and expected evidence are intentionally kept in the script so the demo is repeatable in a recruiter interview or screen recording.
+
+## Observability screenshots
+
+The architecture explains the relationships; screenshots show the system operating. Follow [the screenshot capture guide](docs/screenshots/README.md) to add `grafana-homelab.png` and `prometheus-targets.png` from a live cluster.
+
 ## Design decisions and limitations
 
 - MariaDB and Redis use StatefulSets because they require stable identities and storage. This is a learning environment, not a highly available database design.
@@ -104,5 +128,4 @@ kind-config.yaml        Three-node local cluster
 
 ## Portfolio talking points
 
-This lab shows the difference between Deployments and StatefulSets, why resource requests are required for CPU-based HPA, how Ingress separates routing from services, how PVC access modes constrain scaling, and how metrics and logs form complementary observability signals. Screenshots of Grafana dashboards, the Kubernetes resource inventory, and an HPA scaling event make useful additions to a project write-up.
-
+This lab shows the difference between Deployments and StatefulSets, why resource requests are required for CPU-based HPA, how Ingress separates routing from services, how PVC access modes constrain scaling, and how metrics and logs form complementary observability signals. The failure/recovery walkthrough, Grafana dashboard, Prometheus targets page, and Kubernetes resource inventory make useful additions to a project write-up.

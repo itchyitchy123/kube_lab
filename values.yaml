@@ -22,7 +22,7 @@ nginx:
   autoscaling:
     enabled: true
     minReplicas: 2
-    maxReplicas: 5
+    maxReplicas: 6
     targetCPUUtilizationPercentage: 70
 
 wordpress:
